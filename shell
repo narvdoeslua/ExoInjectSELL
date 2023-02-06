@@ -13,7 +13,7 @@ getgenv().TracerRadius = false
 getgenv().GrabbedCheck = true
 getgenv().KoCheck = true
 getgenv().loaded = false
-getgenv().AorinjectSettings = {
+getgenv().exoSettings = {
     SilentAim = true,
     Prediction = 0.1281,
 }
@@ -78,7 +78,7 @@ local fovvalue = "60"
 local silentfovvalue = "40"
 local keybindvalue = "q"
 
-getgenv().Aorinject = {
+getgenv().exo = {
     Enabled = true,
     ShowFOV = false,
     FOV = 40,
@@ -94,23 +94,23 @@ getgenv().Aorinject = {
 local circle = Drawingnew("Circle")
 circle.Transparency = 0.4
 circle.Thickness = 0.8
-circle.Color = Aorinject.FOVColour
+circle.Color = exo.FOVColour
 circle.Filled = false
-Aorinject.FOVCircle = circle
+exo.FOVCircle = circle
 
-function Aorinject.UpdateFOV()
+function exo.UpdateFOV()
     if not (circle) then
         return
     end
-    circle.Visible = Aorinject.ShowFOV
-    circle.Radius = Aorinject.FOV
+    circle.Visible = exo.ShowFOV
+    circle.Radius = exo.FOV
     circle.Position = Vector2new(Mouse.X, Mouse.Y + GetGuiInset(GuiService).Y)
-    circle.NumSides = Aorinject.FOVSides
-    circle.Color = Aorinject.FOVColour
+    circle.NumSides = exo.FOVSides
+    circle.Color = exo.FOVColour
     return circle
 end
 
-function Aorinject.IsPartVisible(Part, PartDescendant)
+function exo.IsPartVisible(Part, PartDescendant)
     local Character = LocalPlayer.Character or CharacterAddedWait(CharacterAdded)
     local Origin = CurrentCamera.CFrame.Position
     local _, OnScreen = WorldToViewportPoint(CurrentCamera, Part.Position)
@@ -128,7 +128,7 @@ function Aorinject.IsPartVisible(Part, PartDescendant)
     return false
 end
 
-function Aorinject.Raycast(Origin, Destination, UnitMultiplier)
+function exo.Raycast(Origin, Destination, UnitMultiplier)
     if (typeof(Origin) == "Vector3" and typeof(Destination) == "Vector3") then
         if (not UnitMultiplier) then UnitMultiplier = 1 end
         local Direction = (Destination - Origin).Unit * UnitMultiplier
@@ -142,24 +142,24 @@ function Aorinject.Raycast(Origin, Destination, UnitMultiplier)
     return nil
 end
 
-function Aorinject.Character(Player)
+function exo.Character(Player)
     return Player.Character
 end
 
-function Aorinject.CheckHealth(Player)
-    local Character = Aorinject.Character(Player)
+function exo.CheckHealth(Player)
+    local Character = exo.Character(Player)
     local Humanoid = FindFirstChildWhichIsA(Character, "Humanoid")
     local Health = (Humanoid and Humanoid.Health or 0)
     return Health > 0
 end
 
-function Aorinject.Check()
-    return (Aorinject.Enabled == true and Aorinject.Selected ~= LocalPlayer and Aorinject.SelectedPart ~= nil)
+function exo.Check()
+    return (exo.Enabled == true and exo.Selected ~= LocalPlayer and exo.SelectedPart ~= nil)
 end
-Aorinject.checkSilentAim = Aorinject.Check
+exo.checkSilentAim = exo.Check
 
-function Aorinject.GetClosestTargetPartToCursor(Character)
-    local TargetParts = Aorinject.TargetPart
+function exo.GetClosestTargetPartToCursor(Character)
+    local TargetParts = exo.TargetPart
 
     local ClosestPart = nil
     local ClosestPartPosition = nil
@@ -204,17 +204,17 @@ function Aorinject.GetClosestTargetPartToCursor(Character)
     return ClosestPart, ClosestPartPosition, ClosestPartOnScreen, ClosestPartMagnitudeFromMouse
 end
 
-function Aorinject.GetClosestPlayerToCursor()
+function exo.GetClosestPlayerToCursor()
     local TargetPart = nil
     local ClosestPlayer = nil
     local ShortestDistance = 1/0
     for _, Player in ipairs(GetPlayers(Players)) do
-        local Character = Aorinject.Character(Player)
+        local Character = exo.Character(Player)
         if Character then
-            local TargetPartTemp, _, _, Magnitude = Aorinject.GetClosestTargetPartToCursor(Character)
-            if (TargetPartTemp and Aorinject.CheckHealth(Player)) then
+            local TargetPartTemp, _, _, Magnitude = exo.GetClosestTargetPartToCursor(Character)
+            if (TargetPartTemp and exo.CheckHealth(Player)) then
                 if (circle.Radius > Magnitude and Magnitude < ShortestDistance) then
-                    if (Aorinject.VisibleCheck and not Aorinject.IsPartVisible(TargetPartTemp, Character)) then continue end
+                    if (exo.VisibleCheck and not exo.IsPartVisible(TargetPartTemp, Character)) then continue end
                     ClosestPlayer = Player
                     ShortestDistance = Magnitude
                     TargetPart = TargetPartTemp
@@ -222,16 +222,16 @@ function Aorinject.GetClosestPlayerToCursor()
             end
         end
     end
-    Aorinject.Selected = ClosestPlayer
-    Aorinject.SelectedPart = TargetPart
+    exo.Selected = ClosestPlayer
+    exo.SelectedPart = TargetPart
 end
 
 Heartbeat:Connect(function()
-    Aorinject.UpdateFOV()
-    Aorinject.GetClosestPlayerToCursor()
-    if Aorinject.Selected and Aorinject.Selected ~= game.Players.LocalPlayer and Aorinject.Selected.Character:WaitForChild("BodyEffects")["K.O"].Value == false and Aorinject.Selected.Character:FindFirstChild("GRABBING_CONSTRAINT") == false then
-        Aorinject.SelectedPart.Velocity = Vector3.new(Aorinject.SelectedPart.Velocity.X, 0, Aorinject.SelectedPart.Velocity.Z)
-        Aorinject.SelectedPart.AssemblyLinearVelocity = Vector3.new(Aorinject.SelectedPart.Velocity.X, 0, Aorinject.SelectedPart.Velocity.Z)
+    exo.UpdateFOV()
+    exo.GetClosestPlayerToCursor()
+    if exo.Selected and exo.Selected ~= game.Players.LocalPlayer and exo.Selected.Character:WaitForChild("BodyEffects")["K.O"].Value == false and exo.Selected.Character:FindFirstChild("GRABBING_CONSTRAINT") == false then
+        exo.SelectedPart.Velocity = Vector3.new(exo.SelectedPart.Velocity.X, 0, exo.SelectedPart.Velocity.Z)
+        exo.SelectedPart.AssemblyLinearVelocity = Vector3.new(exo.SelectedPart.Velocity.X, 0, exo.SelectedPart.Velocity.Z)
     end
 end) 
 
@@ -268,11 +268,11 @@ function InRadius()
     end
     return Target
 end
-function Aorinject.Check()
-    if not (Aorinject.Enabled == true and Aorinject.Selected ~= LocalPlayer and Aorinject.SelectedPart ~= nil) then
+function exo.Check()
+    if not (exo.Enabled == true and exo.Selected ~= LocalPlayer and exo.SelectedPart ~= nil) then
         return false
     end
-    local Character = Aorinject.Character(Aorinject.Selected)
+    local Character = exo.Character(exo.Selected)
     local KOd = Character:WaitForChild("BodyEffects")["K.O"].Value
     local Grabbed = Character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
     if getgenv().GrabbedCheck then
@@ -537,7 +537,7 @@ aorinjectbase([[
                                         discord.gg/fZGab9GHSe
 
 
-                                [1] Load Aorinject []] ..aorinjectstatus ..[[]
+                                [1] Load exo []] ..aorinjectstatus ..[[]
                                 [2] Camlock Settings
                                 [3] Silent-Aim Settings
 
@@ -639,7 +639,7 @@ function aoriresponse()
                 end)
             end
         end)
-        AorinjectSettings.SilentAim = true
+        exoSettings.SilentAim = true
         getgenv().loaded = true
         aorinjectstatus = "Loaded"
         rconsoleclear()
@@ -773,11 +773,11 @@ end
 
 function aorisilmiscresponse()
     if aorisilmisc == "0" then
-        if getgenv().AorinjectSettings.SilentAim == true then
-            getgenv().AorinjectSettings.SilentAim = false
+        if getgenv().exoSettings.SilentAim == true then
+            getgenv().exoSettings.SilentAim = false
             silentaimstatus = "Disabled"
-        elseif getgenv().AorinjectSettings.SilentAim == false then
-            getgenv().AorinjectSettings.SilentAim = true
+        elseif getgenv().exoSettings.SilentAim == false then
+            getgenv().exoSettings.SilentAim = true
             silentaimstatus = "Enabled"
         end
         rconsoleclear()
@@ -785,15 +785,15 @@ function aorisilmiscresponse()
     elseif aorisilmisc == "1" then
         rconsoleprint("Prediction: ")
         silpredictionvalue = rconsoleinput("")
-        getgenv().AorinjectSettings.Prediction = tonumber(silpredictionvalue)
+        getgenv().exoSettings.Prediction = tonumber(silpredictionvalue)
         rconsoleclear()
         aorisilmiscs()
     elseif aorisilmisc == "2" then
-        if getgenv().AorinjectSettings.PredictionStatus == true then
-            getgenv().AorinjectSettings.PredictionStatus = false
+        if getgenv().exoSettings.PredictionStatus == true then
+            getgenv().exoSettings.PredictionStatus = false
             silpredictionstatus = "Disabled"
-        elseif getgenv().AorinjectSettings.PredictionStatus == false then
-            getgenv().AorinjectSettings.PredictionStatus = true
+        elseif getgenv().exoSettings.PredictionStatus == false then
+            getgenv().exoSettings.PredictionStatus = true
             silpredictionstatus = "Enabled"
         end
         rconsoleclear()
@@ -821,15 +821,15 @@ function aorisilmiscresponse()
     elseif aorisilmisc == "5" then
         rconsoleprint("FOV: ")
         silentfovvalue = rconsoleinput("")
-        getgenv().Aorinject.FOV = tonumber(silentfovvalue)
+        getgenv().exo.FOV = tonumber(silentfovvalue)
         rconsoleclear()
         aorisilmiscs()
     elseif aorisilmisc == "6" then
-        if getgenv().Aorinject.ShowFOV == true then
-            getgenv().Aorinject.ShowFOV = false
+        if getgenv().exo.ShowFOV == true then
+            getgenv().exo.ShowFOV = false
             silentfovcirclestatus = "false"
-        elseif getgenv().Aorinject.ShowFOV == false then
-            getgenv().Aorinject.ShowFOV = true
+        elseif getgenv().exo.ShowFOV == false then
+            getgenv().exo.ShowFOV = true
             silentfovcirclestatus = "true"
         end
         rconsoleclear()
@@ -847,10 +847,10 @@ end
 
 local __index
 __index = hookmetamethod(game, "__index", function(t, k)
-    if (t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aorinject.Check()) then
-        local SelectedPart = Aorinject.SelectedPart
-        if (getgenv().AorinjectSettings.SilentAim and (k == "Hit" or k == "Target")) then
-            local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * getgenv().AorinjectSettings.Prediction)
+    if (t:IsA("Mouse") and (k == "Hit" or k == "Target") and exo.Check()) then
+        local SelectedPart = exo.SelectedPart
+        if (getgenv().exoSettings.SilentAim and (k == "Hit" or k == "Target")) then
+            local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * getgenv().exoSettings.Prediction)
             return (k == "Hit" and Hit or SelectedPart)
         end
     end
