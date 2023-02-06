@@ -517,7 +517,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
-rconsolename("aorinject")
+rconsolename("Exo | discord.gg/fZGab9GHSe")
 function aorimain()
 aorinjectbase([[
 
