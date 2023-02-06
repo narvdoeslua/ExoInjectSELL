@@ -650,7 +650,7 @@ function aoriresponse()
         aori = rconsoleinput("")
         aoriresponse()
     elseif aori == "X" or aori == "x" then
-        game.Players.LocalPlayer:Kick("AorInject Kick")
+        game.Players.LocalPlayer:Kick("Kicked")
     elseif aori == "2" then
         rconsoleclear()
         aoricammiscs()
